@@ -1,0 +1,173 @@
+---------------------EMPLOYEE TRIGGER-------------------------
+-- CREATE OR REPLACE TRIGGER changeEmpTable
+-- AFTER INSERT OR DELETE OR UPDATE ON EMPLOYEES
+-- FOR EACH ROW
+-- declare v_dml_type varchar2(10);
+-- BEGIN
+--   IF INSERTING THEN
+--    v_dml_type := 'INSERT';
+--     INSERT INTO EMPLOYEES_LOG ( DML_TYPE, OLD_EMP_NAME, OLD_MANAGER_ID, OLD_DEPT_ID, OLD_SALARY_UID,
+--                                 NEW_EMP_NAME, NEW_MANAGER_ID, NEW_DEPT_ID, NEW_SALARY_UID,EMP_ID, LOG_DATE, LOG_USER )
+--     VALUES ( v_dml_type, :OLD.EMP_NAME, :OLD.MANAGER_ID, :OLD.DEPARTMENT_ID, :OLD.SALARY_UID,
+--             :NEW.EMP_NAME, :NEW.MANAGER_ID, :NEW.DEPARTMENT_ID, :NEW.SALARY_UID, :NEW.EMP_ID, SYSDATE, USER );
+--   ELSIF DELETING THEN
+--     v_dml_type := 'DELETE';
+--      INSERT INTO EMPLOYEES_LOG ( DML_TYPE, OLD_EMP_NAME, OLD_MANAGER_ID, OLD_DEPT_ID, OLD_SALARY_UID,
+--                                 NEW_EMP_NAME, NEW_MANAGER_ID, NEW_DEPT_ID, NEW_SALARY_UID,EMP_ID, LOG_DATE, LOG_USER )
+--     VALUES ( v_dml_type, :OLD.EMP_NAME, :OLD.MANAGER_ID, :OLD.DEPARTMENT_ID, :OLD.SALARY_UID,
+--             :NEW.EMP_NAME, :NEW.MANAGER_ID, :NEW.DEPARTMENT_ID, :NEW.SALARY_UID, :OLD.EMP_ID, SYSDATE, USER );
+--   ELSIF UPDATING THEN
+--   v_dml_type := 'UPDATE';
+--    INSERT INTO EMPLOYEES_LOG ( DML_TYPE, OLD_EMP_NAME, OLD_MANAGER_ID, OLD_DEPT_ID, OLD_SALARY_UID,
+--                                 NEW_EMP_NAME, NEW_MANAGER_ID, NEW_DEPT_ID, NEW_SALARY_UID,EMP_ID, LOG_DATE, LOG_USER )
+--     VALUES ( v_dml_type, :OLD.EMP_NAME, :OLD.MANAGER_ID, :OLD.DEPARTMENT_ID, :OLD.SALARY_UID,
+--             :NEW.EMP_NAME, :NEW.MANAGER_ID, :NEW.DEPARTMENT_ID, :NEW.SALARY_UID, :NEW.EMP_ID, SYSDATE, USER );
+--   END IF;
+-- END;
+
+-- CREATE OR REPLACE TRIGGER add_id_emp
+-- BEFORE INSERT ON EMPLOYEES
+-- FOR EACH ROW
+-- BEGIN
+--     :NEW.emp_id := employees_seq.nextval;
+-- END;
+
+-- create or replace trigger update_col 
+-- before update of hiredate, emp_id on employees
+-- for each row
+-- begin
+--     raise_application_error(-20009, 'You cannot update this column!');
+-- end;
+
+------------------------------salary trigger ---------------------------------------
+-- CREATE OR REPLACE trigger salary_audit
+-- AFTER INSERT OR DELETE OR UPDATE ON SALARY
+-- FOR EACH ROW
+-- BEGIN
+--   IF INSERTING THEN
+--     INSERT INTO SALARY_LOG (LOG_USER,LOG_DATE,DML_TYPE,OLD_DA,NEW_DA,OLD_HRA,NEW_HRA,OLD_BASIC_PAY,NEW_BASIC_PAY,OLD_FINAL,NEW_FINAL,OLD_DESIGNATION,NEW_DESIGNATION,SALARY_UID) 
+--     VALUES(user,sysdate, 'Insert',NULL,:NEW.DA,NULL,:NEW.HRA,NULL,:NEW.BASIC_PAY,NULL,:NEW.FINAL_PAY,NULL,:NEW.DESIGNATION,:NEW.SAL_UID);  
+--   ELSIF DELETING THEN
+--    INSERT INTO SALARY_LOG (LOG_USER,LOG_DATE,DML_TYPE,OLD_DA,NEW_DA,OLD_HRA,NEW_HRA,OLD_BASIC_PAY,NEW_BASIC_PAY,OLD_FINAL,NEW_FINAL,OLD_DESIGNATION,NEW_DESIGNATION,SALARY_UID) 
+--     VALUES(user,sysdate, 'Delete',:OLD.DA,NULL,:OLD.HRA,NULL,:OLD.BASIC_PAY,NULL,:OLD.FINAL_PAY,NULL,:OLD.DESIGNATION,NULL,:OLD.SAL_UID);
+--   ELSIF UPDATING THEN
+--      INSERT INTO SALARY_LOG (LOG_USER,LOG_DATE,DML_TYPE,OLD_DA,NEW_DA,OLD_HRA,NEW_HRA,OLD_BASIC_PAY,NEW_BASIC_PAY,OLD_FINAL,NEW_FINAL,OLD_DESIGNATION,NEW_DESIGNATION,SALARY_UID) 
+--     VALUES(user,sysdate, 'Update',:OLD.DA,:NEW.DA,:OLD.HRA,:NEW.HRA,:OLD.BASIC_PAY,:NEW.BASIC_PAY,:OLD.FINAL_PAY,:NEW.FINAL_PAY,:OLD.DESIGNATION,:NEW.DESIGNATION,:NEW.SAL_UID);
+--   END IF;
+-- END;
+
+-- create or replace trigger add_sal_id
+-- before insert on salary
+-- for each row
+-- begin
+--     :new.sal_uid := sal_seq.nextval;
+-- end;
+
+create or replace trigger update_sal
+before update of sal_uid on salary
+begin
+    raise_application_error(-20014,'You cannot update this field');
+end;
+
+------------------------------------------ project trigger----------------------
+-- CREATE OR REPLACE TRIGGER changeProjTable
+-- AFTER INSERT OR DELETE OR UPDATE ON PROJECTS
+-- FOR EACH ROW
+-- BEGIN
+--   IF INSERTING THEN
+--     INSERT INTO PROJECTS_LOG ( DML_TYPE, 
+--                                 NEW_PROJ_ID, NEW_MANAGER_ID, NEW_PROJ_NAME,
+--                                 LOG_DATE, LOG_USER)
+--                 VALUES (        'Insert ',
+--                                 :NEW.PROJ_ID, :NEW.EMP_ID, :NEW.PROJ_NAME,
+--                                 SYSDATE, USER);
+--   ELSIF DELETING THEN
+--     INSERT INTO PROJECTS_LOG ( DML_TYPE, 
+--                                 OLD_PROJ_ID, OLD_MANAGER_ID, OLD_PROJ_NAME,
+--                                 LOG_DATE, LOG_USER)
+--                 VALUES (       'DELETE ',
+--                                :OLD.PROJ_ID, :OLD.EMP_ID, :OLD.PROJ_NAME,
+--                                SYSDATE, USER);
+--   ELSIF UPDATING THEN
+--     INSERT INTO PROJECTS_LOG ( DML_TYPE,
+--                                 OLD_PROJ_ID, OLD_MANAGER_ID, OLD_PROJ_NAME,
+--                                 NEW_PROJ_ID, NEW_MANAGER_ID, NEW_PROJ_NAME,
+--                                 LOG_DATE, LOG_USER )
+--                 VALUES (       'Update ',
+--                                :OLD.PROJ_ID, :OLD.EMP_ID, :OLD.PROJ_NAME,
+--                                :NEW.PROJ_ID, :NEW.EMP_ID, :NEW.PROJ_NAME,
+--                                SYSDATE, USER );
+--   END IF;
+-- END;
+
+-- create or replace trigger add_proj_id
+-- before insert on projects 
+-- for each row
+-- begin
+--     :new.proj_id := proj_seq.nextval;
+-- end;
+-- create or replace trigger update_proj
+-- before update of proj_id on projects
+-- begin
+--     raise_application_error(-20013,'You cannot update this field');
+-- end;
+
+----------------------------DEPARTMENT TRIGGER---------------------------
+-- create trigger dept_audit
+-- after insert or update or delete
+-- on departments
+-- referencing OLD as old 
+-- NEW as new
+-- for each row
+-- declare
+--  lg_user varchar2 (30);
+--  lg_date  DATE;
+--  lg_dml_type varchar2(30);
+-- begin
+-- select user into lg_user from dual;
+-- if inserting then
+--  lg_dml_type:='INSERT';
+--  insert into dept_log(log_user,log_date,dml_type,old_dept_id,new_dept_id,old_dept_name,new_dept_name)
+--  values(lg_user,sysdate,lg_dml_type,:OLD.dept_id,:NEW.dept_id,:OLD.dept_name,:NEW.dept_name);
+-- elsif updating then
+--  lg_dml_type:='UPDATE';
+--  insert into dept_log(log_user,log_date,dml_type,old_dept_id,new_dept_id,old_dept_name,new_dept_name)
+--  values(lg_user,sysdate,lg_dml_type,:OLD.dept_id,:NEW.dept_id,:OLD.dept_name,:NEW.dept_name);
+-- elsif deleting then
+--  lg_dml_type:='DELETE';
+--  insert into dept_log(log_user,log_date,dml_type,old_dept_id,new_dept_id,old_dept_name,new_dept_name)
+--  values(lg_user,sysdate,lg_dml_type,:OLD.dept_id,:NEW.dept_id,:OLD.dept_name,:NEW.dept_name);
+-- end if; 
+-- end;
+
+-- create or replace trigger add_dept_id 
+-- before insert on departments
+-- for each row
+-- begin
+--     :new.dept_id := dept_seq.nextval;
+-- end;
+
+-- create or replace trigger update_dept
+-- before update of dept_id on departments
+-- begin
+--     raise_application_error(-20012,'You cannot update this field');
+-- end;
+
+-------------------------LEAVE TRIGGERS-----------------------
+-- create or replace trigger leave_audit
+-- after insert on leave
+-- for each row
+-- begin
+--     insert into leave_log(log_user, log_date, dml_type, emp_id, leave_date, reason) values (user, sysdate, 'Insert', :new.emp_id, :new.leave_date, :new.reason);
+-- end;
+
+-- create or replace trigger update_leave
+-- before update of emp_id, leave_date, reason on leave
+-- begin
+--     raise_application_error(-20011, 'Cannot update this table!');
+-- end;    
+-- create or replace trigger del_leave
+-- before delete on leave
+-- begin
+--     raise_application_error(-20010, 'Cannot delete from this table!');
+-- end;
